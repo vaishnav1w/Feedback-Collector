@@ -83,10 +83,7 @@ USE_TZ = True
 
 # ✅ Static files for Railway Deployment
 STATIC_URL = '/static/'
-
-# ✅ Check if static folder exists before adding
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
-
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -97,13 +94,13 @@ REST_FRAMEWORK = {
     )
 }
 
-# ✅ Corrected CORS setup (use ALLOWED_ORIGINS not ALL_ORIGINS for list)
+# ✅ CORS Setup
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
-    "https://feedback-collector-ffrontend.netlify.app",
+    "http://localhost:3000",  # ✅ Allow React local dev
+    "https://feedback-collector-ffrontend.netlify.app",  # ✅ Allow Netlify prod frontend
 ]
 
-# ✅ Django sites framework
 SITE_ID = 1
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
