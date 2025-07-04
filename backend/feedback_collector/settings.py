@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-secret-key')
 DEBUG = False
 
 # ✅ Allow all hosts for now or specify your domain
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["https://feedback-collector-production-4556.up.railway.app/",]
 
 # ✅ Installed Apps
 INSTALLED_APPS = [
