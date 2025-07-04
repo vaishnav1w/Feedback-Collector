@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -31,7 +31,7 @@ def analyze_sentiment(text):
     else:
         return 'neutral'
 
-# ✅ Feedback CRUD API
+# ✅ Feedback CRUD API with Debug Logs
 class FeedbackViewSet(viewsets.ModelViewSet):
     queryset = Feedback.objects.all().order_by('-created_at')
     serializer_class = FeedbackSerializer
@@ -39,12 +39,20 @@ class FeedbackViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.request.method == 'DELETE':
             return [IsAdminUser()]
-        return [AllowAny()]  # GET, POST, PUT → allowed for all
+        return [AllowAny()]  # GET, POST, PUT allowed for all
 
-    def perform_create(self, serializer):
-        message = self.request.data.get('message', '')
+    def create(self, request, *args, **kwargs):
+        print("📥 Incoming Feedback Data:", request.data)  # ✅ Log incoming data
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            print("❌ Serializer Errors:", serializer.errors)  # ✅ Log errors
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        message = request.data.get('message', '')
         sentiment = analyze_sentiment(message)
         serializer.save(sentiment=sentiment)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 # ✅ Feedback Statistics (admin only)
 @api_view(['GET'])
