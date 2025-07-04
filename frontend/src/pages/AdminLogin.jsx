@@ -1,7 +1,6 @@
-// src/pages/AdminLogin.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/AdminLogin.css'; // ✅ Import external styles
+import '../styles/AdminLogin.css'; // ✅ External CSS
 
 const AdminLogin = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -14,19 +13,24 @@ const AdminLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch('http://127.0.0.1:8000/api/token/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials),
-    });
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/token/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      localStorage.setItem('adminToken', data.access);
-      alert('✅ Login successful');
-      navigate('/admin');
-    } else {
-      alert('❌ Login failed');
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('adminToken', data.access);
+        alert('✅ Login successful');
+        navigate('/admin');
+      } else {
+        alert('❌ Login failed. Check username or password.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('🚨 Server error. Please try again later.');
     }
   };
 
