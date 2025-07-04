@@ -1,0 +1,136 @@
+/* 🌈 Admin Page Background */
+.admin-page,
+.admin-dark-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(150deg, #152e3c, #045f5f, #1f1c2c);
+  background-size: 400% 400%;
+  animation: bgShift 20s ease infinite;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  color: #f1f1f1;
+}
+
+@keyframes bgShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ✅ Header */
+.admin-dark-header h1 {
+  color: #ffffff; /* White heading */
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.admin-dark-subtitle {
+  color: #dddddd;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* 📤 Toolbar Button */
+.admin-dark-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 2rem;
+}
+
+.admin-dark-btn {
+  background-color: #007bff; /* Blue button */
+  color: #fff;
+  padding: 10px 20px;
+  font-weight: 500;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.admin-dark-btn:hover {
+  background-color: #ed2f2f;
+  transform: scale(1.05);
+}
+
+/* 🧾 Feedback Cards */
+.admin-feedback-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.5rem;
+}
+
+.admin-feedback-card {
+  background-color: #1b1b1e;
+  border-left: 6px solid transparent;
+  border-image: linear-gradient(180deg, #04666b, #0b4e56, #0f7c82);
+  border-image-slice: 1;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.admin-feedback-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.6);
+}
+
+.admin-feedback-card strong {
+  color: #ffffff;
+  font-size: 1.2rem;
+}
+
+.admin-feedback-card p {
+  margin: 0.5rem 0;
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* 🏷️ Sentiment Tags */
+.sentiment-tag {
+  display: inline-block;
+  margin-top: 10px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: white;
+}
+
+.sentiment-tag.positive {
+  background-color: #28a745;
+}
+
+.sentiment-tag.negative {
+  background-color: #e74c3c;
+}
+
+.sentiment-tag.neutral {
+  background-color: #f1c40f;
+  color: #111;
+}
+
+/* 🗑️ Delete Button */
+.admin-delete-btn {
+  margin-top: 14px;
+  align-self: flex-end;
+  background: #ff4c4c;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.admin-delete-btn:hover {
+  background: #cc0000;
+  transform: scale(1.05);
+}
