@@ -95,7 +95,7 @@ REST_FRAMEWORK = {
 }
 
 # ✅ CORS setup (open to all origins — restrict later)
-CORS_ALLOW_ALL_ORIGINS = ["https://feedback-collector-mu.vercel.app/"]
+CORS_ALLOW_ALL_ORIGINS = ["https://feedback-collector-ffrontend.netlify.app"]
 
 # ✅ Django sites framework
 SITE_ID = 1
