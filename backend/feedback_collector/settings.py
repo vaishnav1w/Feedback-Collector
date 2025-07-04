@@ -3,13 +3,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ✅ Use environment variable for secret key
+# ✅ Secret Key from env or fallback
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-secret-key')
 
-# ✅ Debug should be False for production
+# ✅ Turn off debug in production
 DEBUG = False
 
-# ✅ Allow all hosts for now or specify your domain
+# ✅ Allowed Hosts (set via env)
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
 # ✅ Installed Apps
@@ -27,11 +27,11 @@ INSTALLED_APPS = [
     'feedback',
 ]
 
-# ✅ Middleware Setup
+# ✅ Middleware Order (corsheaders should be early)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ✅ For serving static files
-    'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # ✅ Must be near top
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -59,7 +59,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'feedback_collector.wsgi.application'
 
-# ✅ Database - using default SQLite (for now)
+# ✅ SQLite DB
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -67,7 +67,7 @@ DATABASES = {
     }
 }
 
-# ✅ Password Validation
+# ✅ Password Validators
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -81,26 +81,31 @@ TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
-# ✅ Static files for Railway Deployment
+# ✅ Static Files for Railway
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ✅ REST Framework + JWT Setup
+# ✅ REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
 
-# ✅ CORS Setup
+# ✅ FINAL CORS CONFIGURATION
 CORS_ALLOW_ALL_ORIGINS = False
+
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # ✅ Allow React local dev
-    "https://feedback-collector-ffrontend.netlify.app",  # ✅ Allow Netlify prod frontend
+    "http://localhost:3000",  # ✅ for development
+    "https://feedback-collector-ffrontend.netlify.app",  # ✅ for production
 ]
 
+CORS_ALLOW_CREDENTIALS = True  # ✅ Needed for cookies/auth headers
+
+# ✅ Sites Framework
 SITE_ID = 1
 
+# ✅ Auto Field
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
