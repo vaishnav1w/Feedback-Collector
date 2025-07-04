@@ -1,1 +1,1 @@
-web: gunicorn feedback_collector.wsgi
+web: gunicorn feedback_collector.wsgi --log-file -
