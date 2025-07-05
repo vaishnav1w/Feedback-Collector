@@ -3,16 +3,16 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ✅ Secret Key from env or fallback
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fallback-secret-key')
+# ✅ Secret key for local development (keep secret in production)
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-secret-key')
 
-# ✅ Turn off debug in production
-DEBUG = False
+# ✅ Development mode ON
+DEBUG = True
 
-# ✅ Allowed Hosts (set via env)
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+# ✅ Localhost access only
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# ✅ Installed Apps
+# ✅ Installed apps
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -23,15 +23,16 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+
     'feedback',
 ]
 
-# ✅ Middleware Order (corsheaders should be early)
+# ✅ Middleware configuration
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # ✅ Must be near top
+    'corsheaders.middleware.CorsMiddleware',  # ✅ Before CommonMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -40,8 +41,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# ✅ URL configuration
 ROOT_URLCONF = 'feedback_collector.urls'
 
+# ✅ Templates
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -57,9 +60,10 @@ TEMPLATES = [
     },
 ]
 
+# ✅ WSGI
 WSGI_APPLICATION = 'feedback_collector.wsgi.application'
 
-# ✅ SQLite DB
+# ✅ Local DB
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -67,7 +71,7 @@ DATABASES = {
     }
 }
 
-# ✅ Password Validators
+# ✅ Password validators
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -81,31 +85,39 @@ TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
-# ✅ Static Files for Railway
+# ✅ Static files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ✅ REST Framework
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-}
-
-# ✅ FINAL CORS CONFIGURATION
-CORS_ALLOW_ALL_ORIGINS = False
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # ✅ for development
-    "https://feedback-collector-ffrontend.netlify.app",  # ✅ for production
-]
-
-CORS_ALLOW_CREDENTIALS = True  # ✅ Needed for cookies/auth headers
-
-# ✅ Sites Framework
+# ✅ Django site ID
 SITE_ID = 1
 
-# ✅ Auto Field
+# ✅ REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # ✅ Public routes allowed
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ]
+}
+
+# ✅ JWT settings (optional, useful for longer token expiry during dev)
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# ✅ CORS settings for React frontend
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+# ✅ Default primary key type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

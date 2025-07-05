@@ -62,6 +62,7 @@ const Admin = () => {
 
       <div className="admin-dark-list">
         <AdminFeedbackList searchTerm={searchTerm} />
+
       </div>
     </div>
   );

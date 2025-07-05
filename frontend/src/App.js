@@ -1,6 +1,7 @@
 // src/App.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
 import FeedbackForm from './components/FeedbackForm';
 import ListPage from './pages/ListPage';
 import StatsPage from './pages/StatsPage';
@@ -11,48 +12,38 @@ import PrivateRoute from './components/PrivateRoute';
 import { logout, isAuthenticated } from './utils/auth';
 
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+
+  useEffect(() => {
+    const checkLogin = () => setIsLoggedIn(isAuthenticated());
+    window.addEventListener('storage', checkLogin);
+    return () => window.removeEventListener('storage', checkLogin);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setIsLoggedIn(false);
+    window.location.href = '/';
+  };
+
   return (
     <Router>
-      {/* ✅ Styled Navigation Bar */}
-      <nav style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '1rem 2rem',
-        background: 'linear-gradient(90deg, #141e30, #243b55)',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.4)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 1000
-      }}>
-        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ffffff' }}>
-          💬 Feedback Collector
-        </div>
+      <nav style={navBarStyle}>
+        <div style={brandStyle}>💬 Feedback Collector</div>
 
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={navLinksContainer}>
           <Link to="/" style={navLinkStyle}>Home</Link>
           <Link to="/feedbacks" style={navLinkStyle}>Feedbacks</Link>
           <Link to="/stats" style={navLinkStyle}>Stats</Link>
           <Link to="/sentiments" style={navLinkStyle}>Sentiments</Link>
-          {!isAuthenticated() && (
+
+          {!isLoggedIn && (
             <Link to="/admin-login" style={navLinkStyle}>Admin Login</Link>
           )}
-          {isAuthenticated() && (
+          {isLoggedIn && (
             <button
-              onClick={() => {
-                logout();
-                window.location.href = '/';
-              }}
-              style={{
-                backgroundColor: '#dc3545',
-                color: '#fff',
-                border: 'none',
-                padding: '8px 14px',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                transition: 'background 0.3s ease'
-              }}
+              onClick={handleLogout}
+              style={logoutBtnStyle}
               onMouseOver={(e) => e.target.style.background = '#c82333'}
               onMouseOut={(e) => e.target.style.background = '#dc3545'}
             >
@@ -62,28 +53,44 @@ const App = () => {
         </div>
       </nav>
 
-      {/* ✅ Application Routes */}
       <Routes>
         <Route path="/" element={<FeedbackForm />} />
-        <Route path="/feedbacks" element={
-          <PrivateRoute><ListPage /></PrivateRoute>
-        } />
-        <Route path="/stats" element={
-          <PrivateRoute><StatsPage /></PrivateRoute>
-        } />
-        <Route path="/sentiments" element={
-          <PrivateRoute><SentimentPage /></PrivateRoute>
-        } />
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin" element={
-          <PrivateRoute><Admin /></PrivateRoute>
-        } />
+        <Route path="/feedbacks" element={<PrivateRoute><ListPage /></PrivateRoute>} />
+        <Route path="/stats" element={<PrivateRoute><StatsPage /></PrivateRoute>} />
+        <Route path="/sentiments" element={<PrivateRoute><SentimentPage /></PrivateRoute>} />
+        <Route path="/admin-login" element={<AdminLogin setIsLoggedIn={setIsLoggedIn} />} />
+        <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
       </Routes>
     </Router>
   );
 };
 
-// ✅ Reusable Link Style
+export default App;
+
+// ✅ Styles (re-add these if missing)
+const navBarStyle = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '1rem 2rem',
+  background: 'linear-gradient(90deg, #141e30, #243b55)',
+  boxShadow: '0 4px 10px rgba(0,0,0,0.4)',
+  position: 'sticky',
+  top: 0,
+  zIndex: 1000
+};
+
+const brandStyle = {
+  fontSize: '1.5rem',
+  fontWeight: 'bold',
+  color: '#ffffff'
+};
+
+const navLinksContainer = {
+  display: 'flex',
+  gap: '1rem'
+};
+
 const navLinkStyle = {
   color: '#ffffff',
   textDecoration: 'none',
@@ -93,4 +100,13 @@ const navLinkStyle = {
   fontWeight: 'bold'
 };
 
-export default App;
+const logoutBtnStyle = {
+  backgroundColor: '#dc3545',
+  color: '#fff',
+  border: 'none',
+  padding: '8px 14px',
+  borderRadius: '6px',
+  cursor: 'pointer',
+  fontWeight: 'bold',
+  transition: 'background 0.3s ease'
+};

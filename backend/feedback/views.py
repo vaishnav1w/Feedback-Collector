@@ -16,13 +16,11 @@ def analyze_sentiment(text):
         'perfect', 'nice', 'amazing', 'fantastic', 'wonderful', 'happy',
         'pleased', 'delightful', 'brilliant', 'quality', 'worth'
     ]
-
     negative_keywords = [
         'bad', 'terrible', 'poor', 'hate', 'worst', 'buggy', 'slow',
         'delay', 'issue', 'problem', 'disappointed', 'unhappy',
         'frustrated', 'fool'
     ]
-
     text = text.lower()
     if any(word in text for word in negative_keywords):
         return 'negative'
@@ -31,21 +29,23 @@ def analyze_sentiment(text):
     else:
         return 'neutral'
 
-# ✅ Feedback CRUD API with Debug Logs
+# ✅ Feedback CRUD API
 class FeedbackViewSet(viewsets.ModelViewSet):
     queryset = Feedback.objects.all().order_by('-created_at')
     serializer_class = FeedbackSerializer
 
     def get_permissions(self):
-        if self.request.method == 'DELETE':
-            return [IsAdminUser()]
-        return [AllowAny()]  # GET, POST, PUT allowed for all
+        if self.action in ['list', 'create']:
+            return [AllowAny()]         # ✅ Allow public GET and POST
+        elif self.action in ['destroy']:
+            return [IsAdminUser()]      # ✅ Only admin can DELETE
+        return [IsAuthenticated()]      # ✅ Default fallback
 
     def create(self, request, *args, **kwargs):
-        print("📥 Incoming Feedback Data:", request.data)  # ✅ Log incoming data
+        print("📥 Incoming Feedback Data:", request.data)
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            print("❌ Serializer Errors:", serializer.errors)  # ✅ Log errors
+            print("❌ Serializer Validation Errors:", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         message = request.data.get('message', '')
@@ -54,7 +54,7 @@ class FeedbackViewSet(viewsets.ModelViewSet):
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-# ✅ Feedback Statistics (admin only)
+# ✅ Feedback Statistics for Admin
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def feedback_stats(request):
@@ -71,7 +71,7 @@ def feedback_stats(request):
         'sentiment': dict(by_sentiment),
     })
 
-# ✅ Export CSV (admin only)
+# ✅ Export Feedback as CSV (admin only)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def export_feedback_csv(request):

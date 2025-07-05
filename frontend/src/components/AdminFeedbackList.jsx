@@ -1,8 +1,9 @@
+// src/components/AdminFeedbackList.jsx
 import React, { useEffect, useState } from 'react';
 import { getFeedbacks } from '../services/api';
 import '../styles/Admin.css';
 
-const AdminFeedbackList = () => {
+const AdminFeedbackList = ({ searchTerm }) => {
   const [feedbacks, setFeedbacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
@@ -49,8 +50,17 @@ const AdminFeedbackList = () => {
     }
   };
 
-  const filteredFeedbacks =
-    filter === 'all' ? feedbacks : feedbacks.filter((fb) => fb.sentiment === filter);
+  // ✅ Combine sentiment filter and search filter
+  const filteredFeedbacks = feedbacks
+    .filter((fb) => filter === 'all' || fb.sentiment === filter)
+    .filter((fb) =>
+      fb.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fb.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fb.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fb.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fb.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      fb.sentiment.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   if (loading) return <p style={{ color: '#fff' }}>Loading feedbacks...</p>;
 
@@ -60,68 +70,16 @@ const AdminFeedbackList = () => {
 
       {/* 🎛 Sentiment Filter Buttons */}
       <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-        <button
-          onClick={() => setFilter('all')}
-          style={{
-            padding: '8px 14px',
-            borderRadius: '8px',
-            fontWeight: '600',
-            background: '#ffffff',
-            color: '#000000',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: filter === 'all' ? '0 0 8px rgba(255,255,255,0.8)' : '',
-            transition: '0.3s ease',
-          }}
-        >
+        <button onClick={() => setFilter('all')} style={buttonStyle(filter === 'all', '#ffffff', '#000')}>
           ALL
         </button>
-        <button
-          onClick={() => setFilter('positive')}
-          style={{
-            padding: '8px 14px',
-            borderRadius: '8px',
-            fontWeight: '600',
-            background: '#28a745',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: filter === 'positive' ? '0 0 8px #28a745aa' : '',
-            transition: '0.3s ease',
-          }}
-        >
+        <button onClick={() => setFilter('positive')} style={buttonStyle(filter === 'positive', '#28a745')}>
           POSITIVE
         </button>
-        <button
-          onClick={() => setFilter('neutral')}
-          style={{
-            padding: '8px 14px',
-            borderRadius: '8px',
-            fontWeight: '600',
-            background: '#fd7e14',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: filter === 'neutral' ? '0 0 8px #fd7e14aa' : '',
-            transition: '0.3s ease',
-          }}
-        >
+        <button onClick={() => setFilter('neutral')} style={buttonStyle(filter === 'neutral', '#fd7e14')}>
           NEUTRAL
         </button>
-        <button
-          onClick={() => setFilter('negative')}
-          style={{
-            padding: '8px 14px',
-            borderRadius: '8px',
-            fontWeight: '600',
-            background: '#dc3545',
-            color: '#fff',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: filter === 'negative' ? '0 0 8px #dc3545aa' : '',
-            transition: '0.3s ease',
-          }}
-        >
+        <button onClick={() => setFilter('negative')} style={buttonStyle(filter === 'negative', '#dc3545')}>
           NEGATIVE
         </button>
       </div>
@@ -140,7 +98,6 @@ const AdminFeedbackList = () => {
                   {fb.sentiment.toUpperCase()}
                 </span>
               </div>
-
               <button className="admin-delete-btn" onClick={() => handleDelete(fb.id)}>
                 🗑️ Delete
               </button>
@@ -151,5 +108,17 @@ const AdminFeedbackList = () => {
     </div>
   );
 };
+
+const buttonStyle = (isActive, bg, color = '#fff') => ({
+  padding: '8px 14px',
+  borderRadius: '8px',
+  fontWeight: '600',
+  background: bg,
+  color: color,
+  border: 'none',
+  cursor: 'pointer',
+  boxShadow: isActive ? `0 0 8px ${bg}aa` : '',
+  transition: '0.3s ease',
+});
 
 export default AdminFeedbackList;

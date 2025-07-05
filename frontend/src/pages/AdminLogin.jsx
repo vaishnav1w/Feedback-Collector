@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { login } from '../services/api';
 import { useNavigate } from 'react-router-dom';
-import '../styles/AdminLogin.css'; // ✅ External CSS
+import '../styles/AdminLogin.css';
 
-const AdminLogin = () => {
+const AdminLogin = ({ setIsLoggedIn }) => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -12,33 +14,27 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/token/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('adminToken', data.access);
-        alert('✅ Login successful');
-        navigate('/admin');
-      } else {
-        alert('❌ Login failed. Check username or password.');
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      alert('🚨 Server error. Please try again later.');
+      await login(credentials.username, credentials.password);
+      alert('✅ Login successful');
+      setIsLoggedIn(true);
+      navigate('/admin');
+    } catch (err) {
+      console.error('Login error:', err.response?.data || err.message);
+      alert('❌ Invalid credentials. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="admin-login-container">
       <h2 className="admin-login-heading">🔐 Admin Login</h2>
-      <form onSubmit={handleSubmit} className="admin-login-form">
+      <form className="admin-login-form" onSubmit={handleSubmit}>
         <input
+          type="text"
           name="username"
           placeholder="👤 Username"
           value={credentials.username}
@@ -53,7 +49,9 @@ const AdminLogin = () => {
           onChange={handleChange}
           required
         />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
       </form>
     </div>
   );
