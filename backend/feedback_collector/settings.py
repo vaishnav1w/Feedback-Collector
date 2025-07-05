@@ -14,7 +14,6 @@ ALLOWED_HOSTS = [
     'feedback-collector-production-4556.up.railway.app',
 ]
 
-# ✅ Add this for CORS preflight OPTIONS requests
 CSRF_TRUSTED_ORIGINS = [
     "https://feedback-collector-mu.vercel.app",
 ]
@@ -38,7 +37,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # ✅ CORS must come before CommonMiddleware
+    # ✅ CORS middleware must be before CommonMiddleware
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 
@@ -110,7 +109,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# ✅ CORS config (final)
+# ✅ FINAL CORS CONFIG
 CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
